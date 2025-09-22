@@ -10,6 +10,24 @@ function installFloatingService() {
 	const shadowContainer = document.createElement("div");
 	shadowRoot.appendChild(shadowContainer);
 
+	// Detect dark mode
+	const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+	if (isDarkMode) {
+		shadowContainer.classList.add('dark');
+	}
+
+	// Listen for dark mode changes
+	if (window.matchMedia) {
+		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		mediaQuery.addEventListener('change', (e) => {
+			if (e.matches) {
+				shadowContainer.classList.add('dark');
+			} else {
+				shadowContainer.classList.remove('dark');
+			}
+		});
+	}
+
 	render(createElement(Floating), shadowContainer);
 
 	// Append the floatingContainer to the document body

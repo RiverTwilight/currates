@@ -17,3 +17,36 @@ select.cr-hide-arrow {
 	text-indent: 1px;
 	text-overflow: "";
 }
+
+/* Skeleton loading animations */
+.cr-skeleton {
+	background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+	background-size: 200% 100%;
+	animation: cr-skeleton-loading 1.5s infinite;
+}
+
+/* Dark mode support for skeleton */
+@media (prefers-color-scheme: dark) {
+	.cr-skeleton {
+		background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+		background-size: 200% 100%;
+		animation: cr-skeleton-loading 1.5s infinite;
+	}
+}
+
+/* Also support class-based dark mode */
+.dark .cr-skeleton,
+[data-theme="dark"] .cr-skeleton {
+	background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+	background-size: 200% 100%;
+	animation: cr-skeleton-loading 1.5s infinite;
+}
+
+@keyframes cr-skeleton-loading {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}

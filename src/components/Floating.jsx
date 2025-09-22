@@ -9,12 +9,69 @@ import {
 import estimateValue from "../utils/estimateValue";
 import ItemValue from "./ItemValue";
 
+// Helper function to format timestamp
+function formatTimestamp(timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+
+  if (diffInMinutes < 1) {
+    return "Just now";
+  } else if (diffInMinutes < 60) {
+    return `${diffInMinutes}m ago`;
+  } else if (diffInMinutes < 1440) {
+    // Less than 24 hours
+    const hours = Math.floor(diffInMinutes / 60);
+    return `${hours}h ago`;
+  } else {
+    return (
+      date.toLocaleDateString() +
+      " " +
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    );
+  }
+}
+
+// Skeleton component for loading state
+function SkeletonLoader() {
+  return (
+    <div className="cr-p-2 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-md">
+      <div className="cr-flex cr-justify-between items-center mb-4">
+        <div className="cr-skeleton cr-h-4 cr-w-16 cr-rounded"></div>
+        <div className="cr-flex cr-items-center cr-space-x-2">
+          <div className="cr-skeleton cr-h-6 cr-w-12 cr-rounded"></div>
+          <div className="cr-skeleton cr-h-5 cr-w-5 cr-rounded"></div>
+          <div className="cr-skeleton cr-h-6 cr-w-12 cr-rounded"></div>
+        </div>
+      </div>
+      <div className="cr-skeleton cr-h-12 cr-w-32 cr-rounded cr-mb-2"></div>
+      <div className="cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"></div>
+      <div className="cr-space-y-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="cr-flex cr-justify-between cr-px-1 cr-py-1">
+            <div className="cr-skeleton cr-h-4 cr-w-8 cr-rounded"></div>
+            <div className="cr-skeleton cr-h-4 cr-w-12 cr-rounded"></div>
+          </div>
+        ))}
+      </div>
+      <div className="cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"></div>
+      <div className="cr-flex cr-items-center cr-space-x-2">
+        <div className="cr-skeleton cr-h-6 cr-w-6 cr-rounded"></div>
+        <div className="cr-skeleton cr-h-4 cr-w-20 cr-rounded"></div>
+      </div>
+    </div>
+  );
+}
+
 export default function Floating() {
   const floatingRef = useRef(null);
   const [popupVisible, setPopupVisible] = useState(false);
   const [rawAmount, setRawAmount] = useState(0);
   const [rawCurrency, setRawCurrency] = useState("USD");
   const [rates, setRates] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [priorQueue, setPriorQueue] = useState([
     "USD",
     "GBP",
@@ -85,12 +142,15 @@ export default function Floating() {
   }, [rawAmount, rawCurrency, rates, priorQueue]);
 
   useEffect(() => {
+    setIsLoading(true);
     chrome.runtime.sendMessage(
       {
         type: "GetRates",
       },
       function (data) {
         setRates(data.data);
+        setLastUpdated(data.timestamp);
+        setIsLoading(false);
       }
     );
   }, [rawAmount, rawCurrency]);
@@ -251,75 +311,89 @@ export default function Floating() {
           </button>
         </div>
       </div>
-      <div className="cr-p-2 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-md">
-        <div className="cr-flex cr-justify-between items-center mb-4">
-          <span className="cr-text-md cr-text-slate-400">
-            {`${getSymbol(rawCurrency)}${rawAmount}`}
-          </span>
-          <div className="cr-flex cr-items-center">
-            <select
-              className="cr-hide-arrow cr-rounded-sm dark:cr-bg-slate-500 cr-px-1"
-              onChange={handleRawCurrencyChange}
-              value={rawCurrency}
-            >
-              {priorQueue.map((currency) => (
-                <option key={currency} value={currency}>
-                  {currency}
-                </option>
-              ))}
-            </select>
+      {isLoading ? (
+        <SkeletonLoader />
+      ) : (
+        <div className="cr-p-2 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-md">
+          <div className="cr-flex cr-justify-between items-center mb-4">
+            <span className="cr-text-md cr-text-slate-400">
+              {`${getSymbol(rawCurrency)}${rawAmount}`}
+            </span>
+            <div className="cr-flex cr-items-center">
+              <select
+                className="cr-hide-arrow cr-rounded-sm dark:cr-bg-slate-500 cr-px-1"
+                onChange={handleRawCurrencyChange}
+                value={rawCurrency}
+              >
+                {priorQueue.map((currency) => (
+                  <option key={currency} value={currency}>
+                    {currency}
+                  </option>
+                ))}
+              </select>
 
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="20"
-              viewBox="0 -960 960 960"
-              width="20"
-              className="cr-fill-slate-400"
-            >
-              <path d="M420-308q-8 0-14-5.5t-6-14.5v-304q0-9 6-14.5t14-5.5q2 0 14 6l145 145q5 5 7 10t2 11q0 6-2 11t-7 10L434-314q-3 3-6.5 4.5T420-308Z" />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="20"
+                viewBox="0 -960 960 960"
+                width="20"
+                className="cr-fill-slate-400"
+              >
+                <path d="M420-308q-8 0-14-5.5t-6-14.5v-304q0-9 6-14.5t14-5.5q2 0 14 6l145 145q5 5 7 10t2 11q0 6-2 11t-7 10L434-314q-3 3-6.5 4.5T420-308Z" />
+              </svg>
 
-            <select
-              className="cr-hide-arrow cr-rounded-sm dark:cr-bg-slate-500 cr-px-1"
-              onChange={handleCurrencyChange}
-              value={priorQueue[0]}
-            >
-              {priorQueue.map((currency) => (
-                <option key={currency} value={currency}>
-                  {currency}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div
-          className={`${
-            convertRes[0]?.amount > 1000000000 ? "cr-text-2xl" : "cr-text-4xl"
-          } cr-font-bold mb-2`}
-        >
-          {convertRes.length > 0
-            ? `${getSymbol(convertRes[0].currency)}${
-                Math.floor(convertRes[0].amount * 100) / 100
-              }`
-            : "---.--"}
-        </div>
-
-        {convertRes.length > 0 && itemValue.count > 0 && (
-          <>
-            <div className="cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[2px]"></div>
-            <div>
-              {convertRes.slice(1).map((res) => (
-                <div className="cr-flex cr-justify-between cr-px-1 cr-py-1">
-                  <div>{res.currency}</div>
-                  <div>{convertTo2Float(res.amount)}</div>
-                </div>
-              ))}
+              <select
+                className="cr-hide-arrow cr-rounded-sm dark:cr-bg-slate-500 cr-px-1"
+                onChange={handleCurrencyChange}
+                value={priorQueue[0]}
+              >
+                {priorQueue.map((currency) => (
+                  <option key={currency} value={currency}>
+                    {currency}
+                  </option>
+                ))}
+              </select>
             </div>
-            <div className="cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[2px]"></div>
-            <ItemValue itemValue={itemValue} />
-          </>
-        )}
-      </div>
+          </div>
+          <div
+            className={`${
+              convertRes[0]?.amount > 1000000000 ? "cr-text-2xl" : "cr-text-4xl"
+            } cr-font-bold mb-2`}
+          >
+            {convertRes.length > 0
+              ? `${getSymbol(convertRes[0].currency)}${
+                  Math.floor(convertRes[0].amount * 100) / 100
+                }`
+              : "---.--"}
+          </div>
+
+          {convertRes.length > 0 && itemValue.count > 0 && (
+            <>
+              <div className="cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"></div>
+              <div>
+                {convertRes.slice(1).map((res) => (
+                  <div className="cr-flex cr-justify-between cr-px-1 cr-py-1">
+                    <div>{res.currency}</div>
+                    <div>{convertTo2Float(res.amount)}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"></div>
+              <ItemValue itemValue={itemValue} />
+            </>
+          )}
+
+          {/* Data Updated timestamp */}
+          {lastUpdated && (
+            <>
+              <div className="cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"></div>
+              <div className="cr-text-xs cr-text-slate-500 dark:cr-text-gray-500 cr-text-center cr-py-1">
+                Data updated {formatTimestamp(lastUpdated)}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

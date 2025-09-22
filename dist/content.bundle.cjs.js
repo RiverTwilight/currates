@@ -213,12 +213,75 @@ function ItemValue({
   })[itemValue.id])));
 }
 
+// Helper function to format timestamp
+function formatTimestamp(timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+  if (diffInMinutes < 1) {
+    return "Just now";
+  } else if (diffInMinutes < 60) {
+    return `${diffInMinutes}m ago`;
+  } else if (diffInMinutes < 1440) {
+    // Less than 24 hours
+    const hours = Math.floor(diffInMinutes / 60);
+    return `${hours}h ago`;
+  } else {
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+}
+
+// Skeleton component for loading state
+function SkeletonLoader() {
+  return _("div", {
+    className: "cr-p-2 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-md"
+  }, _("div", {
+    className: "cr-flex cr-justify-between items-center mb-4"
+  }, _("div", {
+    className: "cr-skeleton cr-h-4 cr-w-16 cr-rounded"
+  }), _("div", {
+    className: "cr-flex cr-items-center cr-space-x-2"
+  }, _("div", {
+    className: "cr-skeleton cr-h-6 cr-w-12 cr-rounded"
+  }), _("div", {
+    className: "cr-skeleton cr-h-5 cr-w-5 cr-rounded"
+  }), _("div", {
+    className: "cr-skeleton cr-h-6 cr-w-12 cr-rounded"
+  }))), _("div", {
+    className: "cr-skeleton cr-h-12 cr-w-32 cr-rounded cr-mb-2"
+  }), _("div", {
+    className: "cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"
+  }), _("div", {
+    className: "cr-space-y-2"
+  }, [1, 2, 3, 4].map(i => _("div", {
+    key: i,
+    className: "cr-flex cr-justify-between cr-px-1 cr-py-1"
+  }, _("div", {
+    className: "cr-skeleton cr-h-4 cr-w-8 cr-rounded"
+  }), _("div", {
+    className: "cr-skeleton cr-h-4 cr-w-12 cr-rounded"
+  })))), _("div", {
+    className: "cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"
+  }), _("div", {
+    className: "cr-flex cr-items-center cr-space-x-2"
+  }, _("div", {
+    className: "cr-skeleton cr-h-6 cr-w-6 cr-rounded"
+  }), _("div", {
+    className: "cr-skeleton cr-h-4 cr-w-20 cr-rounded"
+  })));
+}
 function Floating() {
   const floatingRef = A(null);
   const [popupVisible, setPopupVisible] = d(false);
   const [rawAmount, setRawAmount] = d(0);
   const [rawCurrency, setRawCurrency] = d("USD");
   const [rates, setRates] = d(null);
+  const [isLoading, setIsLoading] = d(false);
+  const [lastUpdated, setLastUpdated] = d(null);
   const [priorQueue, setPriorQueue] = d(["USD", "GBP", "EUR", "JPY", "CNY", "PHP"]);
 
   // Drag state
@@ -274,10 +337,13 @@ function Floating() {
     return [res, value];
   }, [rawAmount, rawCurrency, rates, priorQueue]);
   y(() => {
+    setIsLoading(true);
     chrome.runtime.sendMessage({
       type: "GetRates"
     }, function (data) {
       setRates(data.data);
+      setLastUpdated(data.timestamp);
+      setIsLoading(false);
     });
   }, [rawAmount, rawCurrency]);
   y(() => {
@@ -401,7 +467,7 @@ function Floating() {
     className: "cr-fill-white hover:cr-fill-slate-200"
   }, _("path", {
     d: "M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"
-  }))))), _("div", {
+  }))))), isLoading ? _(SkeletonLoader, null) : _("div", {
     className: "cr-p-2 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-md"
   }, _("div", {
     className: "cr-flex cr-justify-between items-center mb-4"
@@ -434,14 +500,18 @@ function Floating() {
   }, currency))))), _("div", {
     className: `${convertRes[0]?.amount > 1000000000 ? "cr-text-2xl" : "cr-text-4xl"} cr-font-bold mb-2`
   }, convertRes.length > 0 ? `${getSymbol(convertRes[0].currency)}${Math.floor(convertRes[0].amount * 100) / 100}` : "---.--"), convertRes.length > 0 && itemValue.count > 0 && _(k$1, null, _("div", {
-    className: "cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[2px]"
+    className: "cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"
   }), _("div", null, convertRes.slice(1).map(res => _("div", {
     className: "cr-flex cr-justify-between cr-px-1 cr-py-1"
   }, _("div", null, res.currency), _("div", null, convertTo2Float(res.amount))))), _("div", {
-    className: "cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[2px]"
+    className: "cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"
   }), _(ItemValue, {
     itemValue: itemValue
-  }))));
+  })), lastUpdated && _(k$1, null, _("div", {
+    className: "cr-bg-slate-200 dark:cr-bg-slate-500 cr-w-full cr-my-2 cr-h-[1px]"
+  }), _("div", {
+    className: "cr-text-xs cr-text-slate-500 dark:cr-text-gray-500 cr-text-center cr-py-1"
+  }, "Data updated ", formatTimestamp(lastUpdated)))));
 }
 
 function installFloatingService() {
@@ -454,6 +524,24 @@ function installFloatingService() {
   // Create a container inside the shadow root
   const shadowContainer = document.createElement("div");
   shadowRoot.appendChild(shadowContainer);
+
+  // Detect dark mode
+  const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (isDarkMode) {
+    shadowContainer.classList.add('dark');
+  }
+
+  // Listen for dark mode changes
+  if (window.matchMedia) {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', e => {
+      if (e.matches) {
+        shadowContainer.classList.add('dark');
+      } else {
+        shadowContainer.classList.remove('dark');
+      }
+    });
+  }
   G(_(Floating), shadowContainer);
 
   // Append the floatingContainer to the document body

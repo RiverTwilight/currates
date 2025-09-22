@@ -36,9 +36,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		(async () => {
 			try {
 				let rates = await getRates();
+				const cache = await chrome.storage.local.get("cachedRates");
+				const timestamp = cache.cachedRates ? cache.cachedRates.createAt : Date.now();
 
 				sendResponse({
 					data: rates,
+					timestamp: timestamp,
 				});
 			} catch (error) {
 				console.error("Error fetching exchange rates:", error);

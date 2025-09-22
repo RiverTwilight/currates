@@ -7,10 +7,10 @@ const rawConfig = {
 	manifest_version: 3,
 	version: "1.2",
 	icons: {
-		16: "./icon/logo/icon-16.png",
-		48: "./icon/logo/icon-48.png",
-		96: "./icon/logo/icon-96.png",
-		128: "./icon/logo/icon-128.png",
+		16: "icon/logo/icon-16.png",
+		48: "icon/logo/icon-48.png",
+		96: "icon/logo/icon-96.png",
+		128: "icon/logo/icon-128.png",
 	},
 	permissions: ["storage"],
 	content_scripts: [
