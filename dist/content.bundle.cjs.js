@@ -220,6 +220,13 @@ function Floating() {
   const [rawCurrency, setRawCurrency] = d("USD");
   const [rates, setRates] = d(null);
   const [priorQueue, setPriorQueue] = d(["USD", "GBP", "EUR", "JPY", "CNY", "PHP"]);
+
+  // Drag state
+  const [isDragging, setIsDragging] = d(false);
+  const [dragOffset, setDragOffset] = d({
+    x: 0,
+    y: 0
+  });
   const updatePopupPosition = (x, y) => {
     if (floatingRef.current) {
       const popupWidth = 384;
@@ -300,6 +307,38 @@ function Floating() {
     setRawAmount(amount);
     setRawCurrency(currency);
   };
+
+  // Drag handlers
+  const handleDragStart = e => {
+    if (e.target.closest("button") || e.target.closest("select")) {
+      return; // Don't start drag if clicking on interactive elements
+    }
+    setIsDragging(true);
+    const rect = floatingRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+    e.preventDefault();
+  };
+  const handleDragMove = e => {
+    if (!isDragging || !floatingRef.current) return;
+    const popupWidth = 384;
+    const popupHeight = 400;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    let newX = e.clientX - dragOffset.x;
+    let newY = e.clientY - dragOffset.y;
+
+    // Constrain to viewport bounds
+    newX = Math.max(0, Math.min(newX, windowWidth - popupWidth));
+    newY = Math.max(0, Math.min(newY, windowHeight - popupHeight));
+    floatingRef.current.style.left = `${newX}px`;
+    floatingRef.current.style.top = `${newY}px`;
+  };
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
   y(() => {
     const handleTextSelection = e => {
       let selectedText = window.getSelection().toString();
@@ -325,6 +364,20 @@ function Floating() {
       document.removeEventListener("click", handleOutsideClick);
     };
   }, [popupVisible]);
+
+  // Drag event listeners
+  y(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", handleDragMove);
+      document.addEventListener("mouseup", handleDragEnd);
+      document.body.style.userSelect = "none"; // Prevent text selection during drag
+    }
+    return () => {
+      document.removeEventListener("mousemove", handleDragMove);
+      document.removeEventListener("mouseup", handleDragEnd);
+      document.body.style.userSelect = ""; // Restore text selection
+    };
+  }, [isDragging, dragOffset]);
   return _("div", {
     ref: floatingRef,
     className: "cr-z-[999] cr-text-slate-800 dark:cr-text-white cr-fixed cr-w-72 cr-bg-themed cr-rounded-lg cr-shadow-2xl cr-border-themed cr-border-solid cr-border-2",
@@ -332,7 +385,8 @@ function Floating() {
       display: "none"
     }
   }, _("div", {
-    className: "cr-bg-themed cr-justify-between cr-px-2 cr-flex cr-items-center"
+    className: "cr-bg-themed cr-justify-between cr-px-2 cr-flex cr-items-center cr-cursor-move cr-select-none",
+    onMouseDown: handleDragStart
   }, _("div", {
     className: "cr-text-white cr-flex cr-items-center cr-space-x-1"
   }, "Currates"), _("div", {

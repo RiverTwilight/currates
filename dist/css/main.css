@@ -646,6 +646,16 @@ video {
   flex: 1 1 0%;
 }
 
+.cr-cursor-move {
+  cursor: move;
+}
+
+.cr-select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
 .cr-flex-col {
   flex-direction: column;
 }
