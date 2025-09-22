@@ -293,7 +293,7 @@ function Floating() {
   const updatePopupPosition = (x, y) => {
     if (floatingRef.current) {
       const popupWidth = 384;
-      const popupHeight = 400;
+      const popupHeight = 420;
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
 
