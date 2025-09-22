@@ -8,7 +8,7 @@
 		"predev": "node ./src/utils/init.js",
 		"dev": "npm-run-all dev:*",
 		"dev:core": "rollup -c -w",
-		"dev:style": "npx tailwindcss -i ./src/main.css -o ./dist/css/main.css --watch",
+		"dev:style": "tailwindcss -i ./src/main.css -o ./dist/css/main.css --watch",
 		"build": "rollup -c",
 		"build:content": "rollup ./src/components/content.js --file ./dist/content.bundle.js",
 		"test": "jest"
@@ -30,17 +30,18 @@
 		"@babel/core": "^7.20.12",
 		"@babel/plugin-transform-react-jsx": "^7.20.7",
 		"@babel/preset-env": "^7.26.0",
-		"babel-jest": "^29.7.0",
 		"@rollup/plugin-alias": "^4.0.2",
 		"@rollup/plugin-babel": "^6.0.3",
 		"@rollup/plugin-commonjs": "^24.0.0",
 		"@rollup/plugin-node-resolve": "^15.0.1",
 		"@rollup/plugin-typescript": "^11.0.0",
 		"atomizer": "^3.24.2",
+		"babel-jest": "^29.7.0",
 		"concurrently": "^7.6.0",
 		"jest": "^29.7.0",
 		"npm-run-all": "^4.1.5",
 		"rollup": "^4.52.0",
+		"tailwindcss": "^3.4.17",
 		"typescript": "^5.9.2"
 	},
 	"jest": {

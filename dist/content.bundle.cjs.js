@@ -327,7 +327,7 @@ function Floating() {
   }, [popupVisible]);
   return _("div", {
     ref: floatingRef,
-    className: "cr-z-[999] cr-text-slate-800 dark:cr-text-white cr-fixed cr-w-72 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-lg cr-shadow-2xl cr-border-themed cr-border-solid cr-border-2",
+    className: "cr-z-[999] cr-text-slate-800 dark:cr-text-white cr-fixed cr-w-72 cr-bg-themed cr-rounded-lg cr-shadow-2xl cr-border-themed cr-border-solid cr-border-2",
     style: {
       display: "none"
     }
@@ -348,7 +348,7 @@ function Floating() {
   }, _("path", {
     d: "M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"
   }))))), _("div", {
-    className: "cr-p-2"
+    className: "cr-p-2 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-md"
   }, _("div", {
     className: "cr-flex cr-justify-between items-center mb-4"
   }, _("span", {

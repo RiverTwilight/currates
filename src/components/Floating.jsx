@@ -176,7 +176,7 @@ export default function Floating() {
 	return (
 		<div
 			ref={floatingRef}
-			className="cr-z-[999] cr-text-slate-800 dark:cr-text-white cr-fixed cr-w-72 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-lg cr-shadow-2xl cr-border-themed cr-border-solid cr-border-2"
+			className="cr-z-[999] cr-text-slate-800 dark:cr-text-white cr-fixed cr-w-72 cr-bg-themed cr-rounded-lg cr-shadow-2xl cr-border-themed cr-border-solid cr-border-2"
 			style={{ display: "none" }}
 		>
 			<div className="cr-bg-themed cr-justify-between cr-px-2 cr-flex cr-items-center">
@@ -197,7 +197,7 @@ export default function Floating() {
 					</button>
 				</div>
 			</div>
-			<div className="cr-p-2">
+			<div className="cr-p-2 cr-bg-slate-100 dark:cr-bg-slate-800 cr-rounded-md">
 				<div className="cr-flex cr-justify-between items-center mb-4">
 					<span className="cr-text-md cr-text-slate-400">
 						{`${getSymbol(rawCurrency)}${rawAmount}`}
