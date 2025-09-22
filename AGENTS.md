@@ -16,50 +16,26 @@ https://github.com/RiverTwilight/Currates/assets/52880665/15b828d5-be39-4cdd-989
 
 ## Features
 
--   [x] Detect & convert currency by selecting text
--   [x] Display multiple results in one screen
--   [x] Estimate value based on items
--   [x] Customize OpenExchange key
--   [x] Full open-source, no privacy worry
--   [x] Tiny & Super fast (Only 2kb packed size)
--   [-] Cryptocurrency
--   [-] Exception List
+- [x] Detect & convert currency by selecting text
+- [x] Display multiple results in one screen
+- [x] Estimate value based on items
+- [x] Customize OpenExchange key
+- [x] Full open-source, no privacy worry
+- [x] Tiny & Super fast (Only 2kb packed size)
+- [-] Cryptocurrency
+- [-] Exception List
 
 ## Get Currates
 
--   [Chrome Web Store](https://chromewebstore.google.com/detail/currates-immersive-curren/lgdpchmlpgooalofkdcgciaibpieoofc?hl=en-US)
--   Firefox Add-ons (Working)
--   Edge Add-ons (Working)
-
-## Contribution
-
-```bash
-pnpm run dev # Start Rollup server
-pnpm run dev:style # Start Tailwind server
-```
-
-The you can load the unpacked extension from `dist` in the extension setting page.
-
-Open `test/index.html` to test the extension by selecting text on it.
-
-### How hot-load server works
-
-Do not modify `manifest.json` directly in the `dist` folder. Edit `init.js` instead.
-
-### How it works
-
-After user opened a webpage, the extension will:
-
-1. Create a shadow root node in the original page
-2. Render React app to the root
-3. Inject prefixed style to the page
-4. The React app listen to the mouse event
+- [Chrome Web Store](https://chromewebstore.google.com/detail/currates-immersive-curren/lgdpchmlpgooalofkdcgciaibpieoofc?hl=en-US)
+- Firefox Add-ons (Working)
+- Edge Add-ons (Working)
 
 ## Credits
 
--   [CoinMarketCap](https://pro.coinmarketcap.com/signup/?plan=0): API
--   [OpenExchange](https://pro.coinmarketcap.com/signup/?plan=0): API
--   [Xe Symbol](https://www.xe.com/symbols/)
+- [CoinMarketCap](https://pro.coinmarketcap.com/signup/?plan=0): API
+- [OpenExchange](https://pro.coinmarketcap.com/signup/?plan=0): API
+- [Xe Symbol](https://www.xe.com/symbols/)
 
 ## License
 
