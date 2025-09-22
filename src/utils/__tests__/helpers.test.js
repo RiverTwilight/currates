@@ -65,6 +65,30 @@ describe("extractAmount", () => {
 			currency: "GBP",
 			amount: 750,
 		});
+		expect(extractAmount("RMB 1000")).toEqual({
+			currency: "CNY",
+			amount: 1000,
+		});
+		expect(extractAmount("CNY 2500")).toEqual({
+			currency: "CNY",
+			amount: 2500,
+		});
+		expect(extractAmount("JPY 15000")).toEqual({
+			currency: "JPY",
+			amount: 15000,
+		});
+		expect(extractAmount("CHF 120")).toEqual({
+			currency: "CHF",
+			amount: 120,
+		});
+		expect(extractAmount("AUD 85")).toEqual({
+			currency: "AUD",
+			amount: 85,
+		});
+		expect(extractAmount("CAD 95")).toEqual({
+			currency: "CAD",
+			amount: 95,
+		});
 	});
 
 	// Numbers with suffixes
