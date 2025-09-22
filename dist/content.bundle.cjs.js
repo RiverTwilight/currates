@@ -410,8 +410,10 @@ function Floating() {
       let selectedText = window.getSelection().toString();
       if (selectedText && selectedText.length < 50 && e.target.id !== "cr_container") {
         const extractedAmount = extractAmount(selectedText);
-        updatePopupPosition(e.clientX, e.clientY);
-        handleConvertIntention(extractedAmount.amount, extractedAmount.currency);
+        if (extractedAmount) {
+          updatePopupPosition(e.clientX, e.clientY);
+          handleConvertIntention(extractedAmount.amount, extractedAmount.currency);
+        }
       }
     };
     const handleOutsideClick = e => {
